@@ -6,6 +6,8 @@ import com.speakingclock.enums.Ten;
 import com.speakingclock.exception.InvalidTimeFormatException;
 
 
+import java.util.function.Function;
+
 public class TimeToWordsConverter {
     public static String convertTimeToWords(String time) {
         if (time == null || time.isEmpty()) {
@@ -30,18 +32,16 @@ public class TimeToWordsConverter {
             throw new InvalidTimeFormatException("Invalid time. Hours must be between 0-23 and minutes between 0-59");
         }
 
-        StringBuilder timeInWords = new StringBuilder("It's ");
-        if (hours == 0 && minutes == 0) {
-            timeInWords.append("Midnight");
-        } else if (hours == 12 && minutes == 0) {
-            timeInWords.append("Midday");
-        } else {
-            timeInWords.append(convertHoursToWords(hours))
-                    .append(" ").append(convertMinutesToWords(minutes))
-                    .append(" ").append(getTimeOfDay(hours));;
-        }
+        String timeOfDay = getTimeOfDay(hours);
 
-        return timeInWords.toString();
+        String timeInWords = "It's " +
+                (hours == 0 && minutes == 0 ? "Midnight" :
+                        (hours == 12 && minutes == 0 ? "Midday" :
+                                convertHoursToWords(hours) + " " +
+                                        convertMinutesToWords(minutes) + " " +
+                                        timeOfDay));
+
+        return timeInWords;
     }
 
     private static String convertHoursToWords(int hours) {
@@ -53,15 +53,19 @@ public class TimeToWordsConverter {
     }
 
     private static String getTimeOfDay(int hours) {
-        if (hours >= 5 && hours < 12) {
-            return "in the morning";
-        } else if (hours >= 12 && hours < 17) {
-            return "in the afternoon";
-        } else if (hours >= 17 && hours < 20) {
-            return "in the evening";
-        } else {
-            return "in the night";
-        }
+        Function<Integer, String> getTimeOfDayFn = hour -> {
+            if (hour >= 5 && hour < 12) {
+                return "in the morning";
+            } else if (hour >= 12 && hour < 17) {
+                return "in the afternoon";
+            } else if (hour >= 17 && hour < 20) {
+                return "in the evening";
+            } else {
+                return "in the night";
+            }
+        };
+
+        return getTimeOfDayFn.apply(hours);
     }
 
     private static String convertMinutesToWords(int minutes) {
@@ -73,11 +77,15 @@ public class TimeToWordsConverter {
             int tensDigit = minutes / 10;
             int onesDigit = minutes % 10;
 
-            if (onesDigit == 0) {
-                return Ten.fromDigit(tensDigit).getWord();
-            } else {
-                return Ten.fromDigit(tensDigit).getWord() + " " + Number.fromMinute(onesDigit).getWord();
-            }
+            Function<Integer, String> getTenWordFn = tens -> {
+                if (onesDigit == 0) {
+                    return Ten.fromDigit(tens).getWord();
+                } else {
+                    return Ten.fromDigit(tens).getWord() + " " + Number.fromMinute(onesDigit).getWord();
+                }
+            };
+
+            return getTenWordFn.apply(tensDigit);
         }
     }
 }
