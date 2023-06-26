@@ -10,17 +10,39 @@ To use the Speaking Clock Service, follow the steps below:
 
 # Installation
 1. Clone the repository to your local machine:
+
    git clone https://github.com/your-username/speaking-clock-service.git
 
 2. Navigate to the project directory:
+
    cd speaking-clock-service
 
 3. Build the project using Maven:
-   mvn clean package
 
-# Usage
-1. Start the application by running the following command:
-   java -jar target/speaking-clock-service.jar
+   mvn clean install
+
+# Running the Application
+  There are two ways to run the Speaking Clock Service: 
+  using Maven or running the generated JAR file.
+
+  * Using Maven
+     Once the build is successful, run the following command to start the application using Maven:
+
+     mvn spring-boot:run
+
+     - The application will start running on http://localhost:8080
+
+  * Using the JAR File
+
+    1. After the successful build, navigate to the target directory:
+    
+       cd target
+       java -jar speaking-clock-service.jar
+    
+   - The application will start running on http://localhost:8080
+
+
+
 
 # API Endpoints
 # Convert Current Time to Words:
